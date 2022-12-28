@@ -75,29 +75,34 @@ const handleSubmit = async (e) => {
 
     loader(messageDiv);
 
+    // const URL_SERVER = 'http://localhost:5002';
+    const URL_SERVER = 'https://liamai.onrender.com';
+
     //fetch data from server -> bots response
-    const response = await fetch('https://liamai.onrender.com', {
+    const response = await fetch(`${URL_SERVER}`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             prompt: data.get('prompt')
         })
-    });
+    })
 
     clearInterval(loadInterval);
-    messageDiv.innerHTML = '';
+    messageDiv.innerHTML = " ";
+
 
     if (response.ok) {
         const data = await response.json();
-        const parsedData = data.bot.trim();
+        const parsedData = data.bot.trim() // trims any trailing spaces/'\n' 
 
-        typeText(messageDiv, parsedData);
+        typeText(messageDiv, parsedData)
     } else {
-        const err = await response.text();
-        messageDiv.innerHTML = "Something went wrong";
-        alert(err);
+        const err = await response.text()
+
+        messageDiv.innerHTML = "Something went wrong"
+        alert(err)
     }
 }
 
