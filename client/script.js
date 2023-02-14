@@ -1,85 +1,92 @@
-import bot from './assets/bot.svg';
+import bot from './assets/bot.svg'
 import user from './assets/user.svg'
 
-const form = document.querySelector('form');
-const chatContainer = document.querySelector('#chat_container');
+const form = document.querySelector('form')
+const chatContainer = document.querySelector('#chat_container')
 
-let loadInterval;
+let loadInterval
 
 function loader(element) {
-    element.textContent = '';
+    element.textContent = ''
 
     loadInterval = setInterval(() => {
+        // Update the text content of the loading indicator
         element.textContent += '.';
 
+        // If the loading indicator has reached three dots, reset it
         if (element.textContent === '....') {
             element.textContent = '';
         }
     }, 300);
 }
 
-function typeText(element, text){
-    let index = 0;
-     let interval = setInterval(() => {
+function typeText(element, text) {
+    let index = 0
+
+    let interval = setInterval(() => {
         if (index < text.length) {
-            element.innerHTML += text.charAt(index);
-            index++;
+            element.innerHTML += text.charAt(index)
+            index++
         } else {
-            clearInterval(interval);
+            clearInterval(interval)
         }
-     }, 20);
+    }, 20)
 }
 
-function generateUniqueId(){
-    const timeStamp = Date.now();
+// generate unique ID for each message div of bot
+// necessary for typing text effect for that specific reply
+// without unique ID, typing text will work on every element
+function generateUniqueId() {
+    const timestamp = Date.now();
     const randomNumber = Math.random();
-    const hexaDecimalString = randomNumber.toString(16);
+    const hexadecimalString = randomNumber.toString(16);
 
-    return `id-${timeStamp}-${hexaDecimalString}`;
+    return `id-${timestamp}-${hexadecimalString}`;
 }
 
-function chatStripe(isAI, value, uniqueId){
+function chatStripe(isAi, value, uniqueId) {
     return (
         `
-        <div class="wrapper ${isAI && 'ai'}">
-        <div class="chat">
-        <div class="profile">
-            <img
-            src = "${isAI ? bot : user}"
-            alt = "${isAI ? 'bot': 'user'}"
-            />
+        <div class="wrapper ${isAi && 'ai'}">
+            <div class="chat">
+                <div class="profile">
+                    <img 
+                      src=${isAi ? bot : user} 
+                      alt="${isAi ? 'bot' : 'user'}" 
+                    />
+                </div>
+                <div class="message" id=${uniqueId}>${value}</div>
+            </div>
         </div>
-            <div class="message" id=${uniqueId}>${value}</div>
-        </div>
-        </div>
-        `
+    `
     )
 }
 
 const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    const data = new FormData(form);
+    const data = new FormData(form)
 
-    //user chat stripe
-    chatContainer.innerHTML += chatStripe(false, data.get('prompt'));
-    form.reset();
+    // user's chatstripe
+    chatContainer.innerHTML += chatStripe(false, data.get('prompt'))
 
-    //bot chat stripe
-    const uniqueId = generateUniqueId();
-    chatContainer.innerHTML += chatStripe(true, " ", uniqueId);
+    // to clear the textarea input 
+    form.reset()
 
+    // bot's chatstripe
+    const uniqueId = generateUniqueId()
+    chatContainer.innerHTML += chatStripe(true, " ", uniqueId)
+
+    // to focus scroll to the bottom 
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
-    const messageDiv = document.getElementById(uniqueId);
+    // specific message div 
+    const messageDiv = document.getElementById(uniqueId)
 
-    loader(messageDiv);
+    // messageDiv.innerHTML = "..."
+    loader(messageDiv)
 
-    // const URL_SERVER = 'http://localhost:5002';
-    const URL_SERVER = 'https://liamai.onrender.com';
-
-    //fetch data from server -> bots response
-    const response = await fetch(`${URL_SERVER}`, {
+    const response = await fetch('http://localhost:5005', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -89,9 +96,8 @@ const handleSubmit = async (e) => {
         })
     })
 
-    clearInterval(loadInterval);
-    messageDiv.innerHTML = " ";
-
+    clearInterval(loadInterval)
+    messageDiv.innerHTML = " "
 
     if (response.ok) {
         const data = await response.json();
@@ -106,9 +112,9 @@ const handleSubmit = async (e) => {
     }
 }
 
-form.addEventListener('submit', handleSubmit);
+form.addEventListener('submit', handleSubmit)
 form.addEventListener('keyup', (e) => {
     if (e.keyCode === 13) {
-        handleSubmit(e);
+        handleSubmit(e)
     }
 })
