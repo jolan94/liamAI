@@ -75,8 +75,8 @@ const handleSubmit = async (e) => {
 
     loader(messageDiv);
 
-    const URL_SERVER = 'http://localhost:5002';
-    // const URL_SERVER = 'https://liamai.onrender.com';
+    // const URL_SERVER = 'http://localhost:5002';
+    const URL_SERVER = 'https://liamai.onrender.com';
 
     //fetch data from server -> bots response
     const response = await fetch(`${URL_SERVER}`, {
